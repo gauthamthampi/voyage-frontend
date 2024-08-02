@@ -32,7 +32,6 @@ const HotelDetail = ({ id }) => {
   const userEmail = getEmailFromToken();
   const [isRoomAvailable, setIsRoomAvailable] = useState(false);
   const router = useRouter()
-  console.log("User"+userEmail);
 
   useEffect(() => {
     fetchHotelDetails();
@@ -195,6 +194,7 @@ const HotelDetail = ({ id }) => {
       checkOutDate,
       travellers: numTravellers,
       rooms: numRooms,
+
     });
 
   
@@ -239,14 +239,17 @@ const HotelDetail = ({ id }) => {
   const handleBookNow = async()=>{
   const numRooms = Number(rooms);
   const numTravellers = Number(travellers);
+  const hotelname = propertyDetails.name
   const selectedRoom = propertyDetails.rooms.find(room => room.category === selectedRoomCategory);
   const queryParams = new URLSearchParams({
     roomCategory: selectedRoomCategory,
+    hotelname: hotelname,
     checkInDate,
     checkOutDate,
     travellers: numTravellers,
     rooms: numRooms,
     roomId: selectedRoom._id,
+    userEmail:userEmail
   }).toString();
   router.push(`/checkout?${queryParams}`);
   }

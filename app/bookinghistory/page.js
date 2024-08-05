@@ -3,6 +3,7 @@ import React, { useState,useEffect } from "react";
 import BookingHistory from "../../components/user/bookinghistory/history";
 import {useRouter} from 'next/navigation'
 import Navbar from "@/components/user/navbar";
+import Footer from "@/components/user/footer";
 
 
 function BookingHistoryPage() {

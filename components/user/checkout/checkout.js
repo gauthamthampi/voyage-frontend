@@ -5,6 +5,7 @@ import { useRouter,useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import BookingConfirmation from '../bookingconfirmation/confirm';
 
 const Checkout = () => {
   const router = useRouter();
@@ -19,6 +20,8 @@ const Checkout = () => {
   const rooms = searchParams.get('rooms');
   const roomId = searchParams.get('roomId');
   const userEmail = searchParams.get('userEmail');
+  const [bookingDetails, setBookingDetails] = useState(null);
+
 
 
   const fetchHotelDetails = async ()=>{
@@ -72,7 +75,7 @@ const totalAmountToPay = totalPrice + 100;
     return newErrors;
   };
  
-  
+
   const handlePayment = async () => {
     const trimmedName = name.trim();
     const newErrors = validate(trimmedName);
@@ -160,8 +163,9 @@ const totalAmountToPay = totalPrice + 100;
               bookingDate
             };
             setShowSuccessModal(true);
+            setBookingDetails(bookingData)
             setTimeout(() => {
-              router.push('/orders');
+              router.push('/bookingOrder');
             }, 9000);
             const result = await axios.post(`${localhost}/api/createbooking`, bookingData);
   
@@ -233,7 +237,7 @@ const totalAmountToPay = totalPrice + 100;
 
   return (
     <div className="container mx-auto p-6">
-            <ToastContainer />
+    <ToastContainer />
     <h1 className='text-center mt-5 mb-10 text-2xl font-bold'>Checkout</h1>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-20">
       <div className="bg-gray-100 p-4 rounded-lg shadow-md">
@@ -259,7 +263,6 @@ const totalAmountToPay = totalPrice + 100;
               <option value="+1">+1</option>
               <option value="+91">+91</option>
               <option value="+44">+44</option>
-              {/* Add more country codes as needed */}
             </select>
             <input
               type="text"
@@ -346,7 +349,8 @@ const totalAmountToPay = totalPrice + 100;
           </div>
         </div>
 
-)}
+      )}
+      {bookingDetails && <BookingConfirmation bookingDetails={bookingDetails} />}
     </div>
   );
 };

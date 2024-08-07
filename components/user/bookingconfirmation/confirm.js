@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { localhost } from '../../../url';
+import { useRouter } from 'next/navigation';
+import { IoCheckmarkDoneCircle } from "react-icons/io5";
+
 
 const BookingConfirmation = ({ bookingId }) => {
   const [bookingDetails, setBookingDetails] = useState(null);
@@ -9,6 +12,7 @@ const BookingConfirmation = ({ bookingId }) => {
   const [roomDetails, setRoomDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter()
 
   useEffect(() => {
     if (bookingId) {
@@ -20,14 +24,6 @@ const BookingConfirmation = ({ bookingId }) => {
           setBookingDetails(bookingResponse.data);
           setPropertyDetails(propertyResponse.data)
           setRoomDetails(roomDetails);
-          console.log(roomDetails);
-          
-
-          
-          // const combinedDetails = {
-          //   ...bookingResponse.data,
-          //   ...propertyResponse.data,
-          // };          
           setLoading(false);
         } catch (err) {
           console.error('Error fetching booking details:', err);
@@ -72,12 +68,12 @@ const BookingConfirmation = ({ bookingId }) => {
 
   return bookingDetails && (
     <div className="container p-6 bg-white shadow-lg rounded-lg overflow-hidden">
-      <div className="bg-blue-600 text-white text-center py-4 px-6 rounded-t-md shadow-md mx-4">
-        <h2 className="text-2xl font-bold mb-2">Booking Successful!</h2>
-        <p className="mb-4">Congratulations, Your booking for this package is done.</p>
-      </div>
+    <div className="bg-blue-600 text-white text-center py-4 px-6 rounded-t-md shadow-md mx-4">
+      <IoCheckmarkDoneCircle className="mx-auto mb-2 text-6xl" />
+      <h2 className="text-2xl font-bold mb-2">Booking Successful!</h2>
+      <p className="mb-4">Congratulations, Your booking for this package is done.</p>
+    </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-        {/* Booking ID, Booked On, and Booking Details */}
         <div className="bg-white shadow-md rounded-lg p-4">
           <p className="text-lg font-bold mb-2">Booking Information</p>
           <p className="font-semibold">Booking ID: {bookingDetails.bookingId}</p>
@@ -87,21 +83,18 @@ const BookingConfirmation = ({ bookingId }) => {
           <p>Check-Out Date: {new Date(bookingDetails.checkOutDate).toLocaleDateString()}</p>
           <p>Room : {roomDetails.category} x {bookingDetails.room[0].quantity}</p>
         </div>
-        {/* Customer Details */}
         <div className="bg-white shadow-md rounded-lg p-4">
           <h3 className="text-lg font-bold mb-2">Customer Details</h3>
           <p>Name: {bookingDetails.userName}</p>
           <p>Email: {bookingDetails.userEmail}</p>
           <p>Phone: {bookingDetails.mobile}</p>
         </div>
-        {/* Billing and Property Details */}
         <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Billing Details */}
           <div className="bg-white shadow-md rounded-lg p-4">
             <h3 className="text-lg font-bold mb-2">Billing Details</h3>
             <div className="flex justify-between items-center">
               <p>Total Amount</p>
-              <p>₹ {roomDetails.price*bookingDetails.room[0].quantity}</p>
+              <p>₹ {roomDetails.price * bookingDetails.room[0].quantity}</p>
             </div>
             <div className="flex justify-between items-center">
               <p>Discount</p>
@@ -112,16 +105,14 @@ const BookingConfirmation = ({ bookingId }) => {
               <p className="font-bold">₹ {bookingDetails.payment[0].amountPaid}</p>
             </div>
           </div>
-          {/* Property Details */}
           <div className="bg-white shadow-md rounded-lg p-4">
             <h3 className="text-lg font-bold mb-2">Property Details</h3>
             <div className="flex gap-4">
-              {/* Property Photo */}
               <div className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg overflow-hidden shadow-md">
                 <img src={`${localhost}/uploads/${propertyDetails.photos[0]}`} alt="Property" className="object-cover w-full h-full" />
               </div>
               <div className="flex-grow">
-              <div className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-2">
                   <p>Name: {propertyDetails.name}</p>
                   <p><a href={`mailto:${bookingDetails.ownerMailId}`}>{bookingDetails.ownerMailId}</a></p>
                 </div>
@@ -130,15 +121,19 @@ const BookingConfirmation = ({ bookingId }) => {
                   <p><a href={`mailto:${bookingDetails.ownerMailId}`}>{bookingDetails.ownerMailId}</a></p>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <p>Address:  
-                    
-                  {propertyDetails.destination}</p>
+                  <p>Address: {propertyDetails.destination}</p>
                   <p></p>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <p>Phone:</p>
                   <p>{bookingDetails.ownerPhone}</p>
                 </div>
+                <button
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  onClick={() => router.push(`/chat/${propertyDetails.email}`)}
+                >
+                  Chat with property owner
+                </button>
               </div>
             </div>
           </div>
@@ -146,9 +141,24 @@ const BookingConfirmation = ({ bookingId }) => {
       </div>
       <div className="text-center p-4">
         <p className="text-gray-700">Thank you for choosing <strong>VOYAGE</strong></p>
+        <div className="mt-4 space-x-4">
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => router.push('/')}
+          >
+            Return to Home
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => router.push('/bookinghistory')}
+          >
+            Order History
+          </button>
+        </div>
       </div>
     </div>
   );
+  
 };
 
 export default BookingConfirmation;

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import  getEmailFromToken  from '../../../utils/decode';
+import getEmailFromToken from '../../../utils/decode';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import GoogleMapModal from "./gmap"
-
+import GoogleMapModal from "./gmap";
 
 function MyProperties() {
   const [showModal, setShowModal] = useState(false);
@@ -16,7 +15,7 @@ function MyProperties() {
     longitude: null,
     destination: '',
     facilities: [{ facility: '', svg: '' }],
-    rooms: [{ category: '', guests: null, availability: null,price: null }],
+    rooms: [{ category: '', guests: null, availability: null, price: null }],
     surroundings: [{ category: '', place: '', distance: null }]
   });
   const [errors, setErrors] = useState({});
@@ -28,6 +27,7 @@ function MyProperties() {
   const token = localStorage.getItem('usertoken');
   const [showGoogleMapModal, setShowGoogleMapModal] = useState(false);
   const [propertyLocation, setPropertyLocation] = useState({ lat: null, lng: null });
+  const userEmail = getEmailFromToken();
 
   const handleOpenGoogleMapModal = () => {
     setShowGoogleMapModal(true);
@@ -46,10 +46,13 @@ function MyProperties() {
     });
   };
 
-    const refresh =  useEffect(() => {
+  useEffect(() => {
+    fetchEmailAndDestinations();
+  }, [token]);
+
     const fetchEmailAndDestinations = async () => {
       try {
-        const userEmail = getEmailFromToken();
+        
         setEmail(userEmail);
 
         try {
@@ -66,9 +69,7 @@ function MyProperties() {
             headers: { 'Authorization': `Bearer ${token}` },
             params: { email: userEmail }
           });
-          console.log(propertiesResponse.data);
           setProperties(propertiesResponse.data);
-          console.log(propertiesResponse.data);
         } catch (error) {
           console.error('Error fetching properties:', error);
         }
@@ -77,8 +78,7 @@ function MyProperties() {
       }
     };
 
-    fetchEmailAndDestinations();
-  }, []);
+    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -134,18 +134,20 @@ function MyProperties() {
       };
     });
   };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setIsEditing(false);
     setProperty({
       name: '',
-      description: '',
-      location: '',
-      destination: '',
       photos: [],
-      facilities: [],
-      rooms: [],
-      surroundings: []
+      description: '',
+      latitude: null,
+      longitude: null,
+      destination: '',
+      facilities: [{ facility: '', svg: '' }],
+      rooms: [{ category: '', guests: null, availability: null, price: null }],
+      surroundings: [{ category: '', place: '', distance: null }]
     });
     setErrors({});
   };
@@ -154,7 +156,6 @@ function MyProperties() {
     const newErrors = {};
     if (!property.name) newErrors.name = 'Name is required';
     if (!property.description) newErrors.description = 'Description is required';
-    // if (!property.location) newErrors.location = 'Location is required';
     if (!property.destination) newErrors.destination = 'Destination is required';
     property.facilities.forEach((facility, index) => {
       if (!facility.facility) newErrors[`facility_${index}`] = 'Facility name is required';
@@ -165,7 +166,6 @@ function MyProperties() {
       if (!room.guests) newErrors[`guests_${index}`] = 'Guests number is required';
       if (!room.availability) newErrors[`availability_${index}`] = 'Availability is required';
       if (!room.price) newErrors[`price_${index}`] = 'Room Amount is required';
-
     });
     property.surroundings.forEach((surrounding, index) => {
       if (!surrounding.category) newErrors[`sur_category_${index}`] = 'Category is required';
@@ -179,42 +179,39 @@ function MyProperties() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-  
+
     const formData = new FormData();
-  formData.append('name', property.name);
-  formData.append('description', property.description);
-  formData.append('latitude', property.latitude);
-  formData.append('longitude', property.longitude);
-  formData.append('destination', property.destination);
-  formData.append('email', email);
-  property.photos.forEach((photo) => formData.append('photos', photo));
-  formData.append('facilities', JSON.stringify(property.facilities));
-  formData.append('rooms', JSON.stringify(property.rooms));
-  formData.append('surroundings', JSON.stringify(property.surroundings));
-    
+    formData.append('name', property.name);
+    formData.append('description', property.description);
+    formData.append('latitude', property.latitude);
+    formData.append('longitude', property.longitude);
+    formData.append('destination', property.destination);
+    formData.append('email', email);
+    property.photos.forEach((photo) => formData.append('photos', photo));
+    formData.append('facilities', JSON.stringify(property.facilities));
+    formData.append('rooms', JSON.stringify(property.rooms));
+    formData.append('surroundings', JSON.stringify(property.surroundings));
+
     try {
-      {isEditing ?? console.log(formData);}
       const response = isEditing
         ? await axios.put(`http://localhost:3001/property/updateProperty/${editingPropertyId}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
-          
         : await axios.post('http://localhost:3001/property/addProperty', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
-  
+
       console.log('Property saved:', response.data);
-  
+
       if (isEditing) {
         const updatedProperties = properties.map(prop =>
           prop._id === editingPropertyId ? response.data : prop
         );
-        
         setProperties(updatedProperties);
       } else {
         setProperties([...properties, response.data]);
       }
-  
+
       setShowModal(false);
       setIsEditing(false);
       setEditingPropertyId(null);
@@ -262,7 +259,6 @@ function MyProperties() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       console.log('Property blocked');
-      refresh;
       toast.success('Property Blocked successfully', {
         position: "top-right",
         autoClose: 5000,
@@ -283,7 +279,7 @@ function MyProperties() {
       await axios.put(`http://localhost:3001/property/blockProperty/${propertyId}`, {}, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      fetchEmailAndDestinations(); 
+      // fetchEmailAndDestinations(); 
       toast.success('Property Blocked successfully', {
         position: "top-right",
         autoClose: 5000,

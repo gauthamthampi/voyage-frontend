@@ -164,15 +164,12 @@ const totalAmountToPay = totalPrice + 100;
             };
             setShowSuccessModal(true);
             setBookingDetails(bookingData)
-            setTimeout(() => {
-              router.push('/bookingOrder');
-            }, 9000);
             const result = await axios.post(`${localhost}/api/createbooking`, bookingData);
   
             if (result.data.success) {
               setShowSuccessModal(true);
               setTimeout(() => {
-                router.push('/orders');
+                router.push(`/bookingconfirmation/${result.data.booking._id}`);
               }, 4000);
             } else {
               console.log(result.data);

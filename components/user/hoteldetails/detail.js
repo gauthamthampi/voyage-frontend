@@ -19,6 +19,7 @@ const HotelDetail = ({ id }) => {
     'Transportation': []
   });
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [ownerBookingModalIsOpen, setOwnerBookingModalIsOpen] = useState(false);
   const [availabilityModalIsOpen, setAvailabilityModalIsOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
   const [propertyDetails, setPropertyDetails] = useState({});
@@ -236,23 +237,29 @@ const HotelDetail = ({ id }) => {
     // closeAvailabilityModal();
   };
   
-  const handleBookNow = async()=>{
-  const numRooms = Number(rooms);
-  const numTravellers = Number(travellers);
-  const hotelname = propertyDetails.name
-  const selectedRoom = propertyDetails.rooms.find(room => room.category === selectedRoomCategory);
-  const queryParams = new URLSearchParams({
-    roomCategory: selectedRoomCategory,
-    hotelname: hotelname,
-    checkInDate,
-    checkOutDate,
-    travellers: numTravellers,
-    rooms: numRooms,
-    roomId: selectedRoom._id,
-    userEmail:userEmail
-  }).toString();
-  router.push(`/checkout?${queryParams}`);
-  }
+  const handleBookNow = async () => {
+    const numRooms = Number(rooms);
+    const numTravellers = Number(travellers);
+    const hotelname = propertyDetails.name;
+    const selectedRoom = propertyDetails.rooms.find(room => room.category === selectedRoomCategory);
+  
+    if (userEmail === propertyDetails.email) {
+      setOwnerBookingModalIsOpen(true);
+      return;
+    }
+  
+    const queryParams = new URLSearchParams({
+      roomCategory: selectedRoomCategory,
+      hotelname: hotelname,
+      checkInDate,
+      checkOutDate,
+      travellers: numTravellers,
+      rooms: numRooms,
+      roomId: selectedRoom._id,
+      userEmail: userEmail,
+    }).toString();
+    router.push(`/checkout?${queryParams}`);
+  };
   
   if (!propertyDetails.name) {
     return <div>Loading...</div>;
@@ -458,6 +465,31 @@ const HotelDetail = ({ id }) => {
          )}
         </div>
       </Modal>
+      <Modal
+  isOpen={ownerBookingModalIsOpen}
+  onRequestClose={() => setOwnerBookingModalIsOpen(false)}
+  contentLabel="Owner Booking Modal"
+  className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center"
+  overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+>
+  <div className="relative bg-white p-6 rounded-lg">
+    <button
+      onClick={() => setOwnerBookingModalIsOpen(false)}
+      className="absolute top-2 right-2 text-black bg-gray-200 rounded-full p-2"
+    >
+      &times;
+    </button>
+    <h2 className="text-xl font-bold mb-4">Cannot Book Your Own Property</h2>
+    <p className="text-gray-700 mb-4">You cannot book your own property.</p>
+    <button
+      onClick={() => setOwnerBookingModalIsOpen(false)}
+      className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+    >
+      Close
+    </button>
+  </div>
+</Modal>
+
     </div>
   );
 };

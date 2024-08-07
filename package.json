@@ -33,6 +33,7 @@
     "react-table": "^7.8.0",
     "react-toastify": "^10.0.5",
     "shortid": "^2.2.16",
+    "socket.io-client": "^4.7.5",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

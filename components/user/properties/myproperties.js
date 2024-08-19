@@ -4,6 +4,7 @@ import getEmailFromToken from '../../../utils/decode';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GoogleMapModal from "./gmap";
+import axiosInstance from '@/utils/axios';
 
 function MyProperties() {
   const [showModal, setShowModal] = useState(false);
@@ -26,7 +27,7 @@ function MyProperties() {
   const [editingPropertyId, setEditingPropertyId] = useState(null);
   const token = localStorage.getItem('usertoken');
   const [showGoogleMapModal, setShowGoogleMapModal] = useState(false);
-  const [propertyLocation, setPropertyLocation] = useState({ lat: null, lng: null });
+  // const [propertyLocation, setPropertyLocation] = useState({ lat: null, lng: null });
   const userEmail = getEmailFromToken();
 
   const handleOpenGoogleMapModal = () => {
@@ -38,7 +39,7 @@ function MyProperties() {
   };
 
   const handleLocationSelect = (location) => {
-    setPropertyLocation(location);
+    // setPropertyLocation(location);
     setProperty({
       ...property,
       latitude: location.lat,
@@ -56,7 +57,7 @@ function MyProperties() {
         setEmail(userEmail);
 
         try {
-          const destinationsResponse = await axios.get('http://localhost:3001/getDestinations', {
+          const destinationsResponse = await axiosInstance.get('http://localhost:3001/getDestinations', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           setDestinations(destinationsResponse.data);
@@ -65,7 +66,7 @@ function MyProperties() {
         }
 
         try {
-          const propertiesResponse = await axios.get('http://localhost:3001/getUserProperties', {
+          const propertiesResponse = await axiosInstance.get('http://localhost:3001/getUserProperties', {
             headers: { 'Authorization': `Bearer ${token}` },
             params: { email: userEmail }
           });
@@ -149,6 +150,7 @@ function MyProperties() {
       rooms: [{ category: '', guests: null, availability: null, price: null }],
       surroundings: [{ category: '', place: '', distance: null }]
     });
+    // setPropertyLocation({ lat: null, lng: null })
     setErrors({});
   };
 
@@ -194,10 +196,10 @@ function MyProperties() {
 
     try {
       const response = isEditing
-        ? await axios.put(`http://localhost:3001/property/updateProperty/${editingPropertyId}`, formData, {
+        ? await axiosInstance.put(`http://localhost:3001/property/updateProperty/${editingPropertyId}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
-        : await axios.post('http://localhost:3001/property/addProperty', formData, {
+        : await axiosInstance.post('http://localhost:3001/property/addProperty', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
 
@@ -242,7 +244,8 @@ function MyProperties() {
       name: propertyToEdit.name,
       photos: propertyToEdit.photos, // Handle existing photos
       description: propertyToEdit.description,
-      location: propertyToEdit.location,
+      latitude: propertyToEdit.location.latitude,
+      longitude:propertyToEdit.location.longitude,
       destination: propertyToEdit.destination,
       facilities: propertyToEdit.facilities,
       rooms: propertyToEdit.rooms,
@@ -341,7 +344,7 @@ function MyProperties() {
           </thead>
           <tbody>
             {properties.map((prop) => (
-              <tr key={prop._id}>
+              <tr key={prop._id} className='hover:bg-gray-100'>
                 <td className='py-2 px-4 border-b text-center'>{prop.name}</td>
                 <td className='py-2 px-4 border-b text-start'>
                   {prop.photos.length > 0 && (
@@ -359,12 +362,21 @@ function MyProperties() {
                   >
                     Edit
                   </button>
-                  <button
-                    className='bg-red-500 text-white font-bold py-2 px-4 mx-2 rounded'
-                    onClick={() => handleBlock(prop._id)}
-                  >
-                    Block
-                  </button>
+                  {prop.status === 'Active' ? (
+    <button 
+      onClick={() => handleBlock(prop._id)}
+      className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-800 transition"
+    >
+      Block
+    </button>
+  ) : (
+    <button 
+      onClick={() => handleBlock(prop._id)}
+      className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-800 transition"
+    >
+      Block
+    </button>
+  )}
                 </td>
               </tr>
             ))}
@@ -401,25 +413,30 @@ function MyProperties() {
           {errors.description && <p className='text-red-500 text-xs'>{errors.description}</p>}
         </div>
         <div className="mb-4">
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-            Location
-          </label>
-          <input
-            id="location"
-            type="text"
-            value={`${location.lat}, ${location.lng}`}
-            readOnly
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={handleOpenGoogleMapModal}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Select Location
-        </button>
-        {errors.location && <p className='text-red-500 text-xs'>{errors.location}</p>}
+  <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+    Location
+  </label>
+  <input
+    id="location"
+    type="text"
+    value={
+      property.latitude && property.longitude
+        ? `${ property.latitude}, ${property.longitude}`
+        : ''
+    }
+    readOnly
+    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+  />
+</div>
+<button
+  type="button"
+  onClick={handleOpenGoogleMapModal}
+  className="px-4 py-2 bg-blue-500 text-white rounded"
+>
+  Select Location
+</button>
+{errors.location && <p className="text-red-500 text-xs">{errors.location}</p>}
+
 
         <div className='mb-4'>
           <label className='block text-sm font-bold mb-2'>Destination</label>

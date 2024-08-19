@@ -101,7 +101,7 @@ const Destinations = () => {
       thingsToDo: destinationDetails.thingsToDo.map(() => ({ place: '', description: '' })),
     };
     let isValid = true;
-
+    
     if (!destinationDetails.name) {
       newErrors.name = 'Name is required';
       isValid = false;
@@ -139,7 +139,7 @@ const Destinations = () => {
     setErrors(newErrors);
     if (!isValid) {
       return;
-    }
+    }               
   
     const formData = new FormData();
     formData.append('name', destinationDetails.name);

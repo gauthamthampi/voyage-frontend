@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import getEmailFromToken from '@/utils/decode';
 import { localhost } from '@/url';
+import axiosInstance from '@/utils/axios';
 
 function BookingsProperties() {
   const [bookings, setBookings] = useState([]);
@@ -15,7 +16,7 @@ function BookingsProperties() {
 
   useEffect(() => {
     if (userEmail) {
-      axios.get(`${localhost}/api/userprofile/bookings`, {
+      axiosInstance.get(`${localhost}/api/userprofile/bookings`, {
         params: {
           userEmail: userEmail,
           limit: 3
@@ -38,7 +39,7 @@ function BookingsProperties() {
 
   const confirmCancelBooking = async () => {
     try {
-      await axios.post(`${localhost}/api/userprofile/cancelbooking/${bookingToCancel}`);
+      await axiosInstance.post(`${localhost}/api/userprofile/cancelbooking/${bookingToCancel}`);
       setBookings((prevBookings) => 
         prevBookings.map((booking) => 
           booking._id === bookingToCancel ? { ...booking, status: 'Cancelled' } : booking
@@ -48,6 +49,19 @@ function BookingsProperties() {
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error cancelling booking:', error);
+    }
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'Upcoming':
+        return 'text-blue-500';
+      case 'Cancelled':
+        return 'text-red-500';
+      case 'Completed':
+        return 'text-green-500';
+      default:
+        return 'text-gray-800';
     }
   };
 
@@ -66,7 +80,7 @@ function BookingsProperties() {
         {bookings.map((booking) => (
           <div 
             key={booking._id} 
-            className="flex border border-gray-300 p-4 rounded-lg relative"
+            className="flex  bg-white shadow-lg p-4 rounded-lg relative"
           >
             <img 
               src={`${localhost}/uploads/${booking.property.photos[0]}`} 
@@ -77,7 +91,7 @@ function BookingsProperties() {
               <h3 className="text-xl font-semibold">{booking.property.name}</h3>
               <p className="text-gray-600">Check-in: {new Date(booking.checkInDate).toLocaleDateString()}</p>
               <p className="text-gray-600">Check-out: {new Date(booking.checkOutDate).toLocaleDateString()}</p>
-              <p className="text-gray-800 font-medium">Status: {booking.status}</p>
+              <p className={`font-medium ${getStatusClass(booking.status)}`}>Status: {booking.status}</p>
             </div>
             {booking.status === 'Upcoming' && (
               <button 

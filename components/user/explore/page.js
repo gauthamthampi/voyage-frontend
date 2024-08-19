@@ -4,6 +4,7 @@ import Image from 'next/image';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { localhost } from '../../../url';
+import axiosInstance from '@/utils/axios';
 
 const PER_PAGE = 5;
 
@@ -14,16 +15,25 @@ const Explore = () => {
   const [filteredHotels, setFilteredHotels] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [checkInDate, setCheckInDate] = useState('');
+  const [checkOutDate, setCheckOutDate] = useState('');
+  const [errors, setErrors] = useState(''); 
   const router = useRouter();
 
   useEffect(() => {
-    fetchAllHotels();
     fetchAllDestinations();
+    fetchAllHotels();
   }, []);
+
+  useEffect(() => {
+    if (checkInDate && checkOutDate) {
+      fetchFilteredHotels();
+    }
+  }, [checkInDate, checkOutDate]);
 
   const fetchAllDestinations = async () => {
     try {
-      const response = await axios.get(localhost+'/getDestinations');
+      const response = await axiosInstance.get(localhost + '/getDestinations');
       setDestinations(response.data);
     } catch (error) {
       console.error('Error fetching destinations:', error);
@@ -32,31 +42,75 @@ const Explore = () => {
 
   const fetchAllHotels = async () => {
     try {
-      const response = await axios.get(localhost+'/api/getAllProperties');
+      const response = await axiosInstance.get(localhost + '/api/getAllProperties');
       setHotels(response.data);
-      setFilteredHotels(response.data);
+      setFilteredHotels(response.data); 
     } catch (error) {
-      console.error('Error fetching hotel data:', error);
+      console.error('Error fetching all hotels:', error);
     }
+  };
+
+  const fetchFilteredHotels = async () => {
+    if (!validateDates()) return;
+  
+    try {
+      const response = await axiosInstance.get(localhost + '/api/getFilteredProperties', {
+        params: {
+          checkInDate,
+          checkOutDate
+        }
+      });
+      const availableHotels = response.data;
+      console.log(response.data);
+      
+      applyFilters(availableHotels); 
+      setErrors(''); 
+    } catch (error) {
+      console.error('Error fetching filtered hotels:', error);
+  
+      const errorMessage = error.response?.data?.message || 'An error occurred while fetching hotels.';
+      
+      setErrors(errorMessage);
+    }
+  };
+  
+
+  const validateDates = () => {
+    const newErrors = {};
+    if (checkInDate && checkOutDate && new Date(checkInDate) > new Date(checkOutDate)) {
+      newErrors.date = 'Check-Out Date must be after Check-In Date';
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(Object.values(newErrors).join(' '));
+      return false;
+    }
+    return true;
+  };
+
+  const handleCheckInDateChange = (event) => {
+    setCheckInDate(event.target.value);
+  };
+
+  const handleCheckOutDateChange = (event) => {
+    setCheckOutDate(event.target.value);
   };
 
   const handleDestinationChange = (event) => {
     setDestination(event.target.value);
   };
 
-  const applyFilters = () => {
-    // Filter hotels based on the selected destination and search input
-    const filtered = hotels.filter(hotel => 
+  const applyFilters = (hotelsToFilter) => {
+    const filtered = hotelsToFilter.filter(hotel =>
       (destination === '' || hotel.destination === destination) &&
       (searchInput === '' || hotel.name.toLowerCase().includes(searchInput.toLowerCase()))
     );
     setFilteredHotels(filtered);
-    setCurrentPage(1); // Reset to the first page on filter
+    setCurrentPage(1); 
   };
 
   const handleSearchChange = (event) => {
     setSearchInput(event.target.value);
-    applyFilters();
+    applyFilters(filteredHotels);
   };
 
   const handlePageChange = (page) => {
@@ -88,8 +142,27 @@ const Explore = () => {
             ))}
           </select>
         </div>
+        <div className="mb-4">
+          <h3 className="font-semibold">Check-In Date</h3>
+          <input
+            type="date"
+            value={checkInDate}
+            onChange={handleCheckInDateChange}
+            className="w-full p-2 border rounded-lg"
+          />
+        </div>
+        <div className="mb-4">
+          <h3 className="font-semibold">Check-Out Date</h3>
+          <input
+            type="date"
+            value={checkOutDate}
+            onChange={handleCheckOutDateChange}
+            className="w-full p-2 border rounded-lg"
+          />
+        </div>
+        {errors && <p className="text-red-500 mb-4">{errors}</p>} {/* Display errors */}
         <button 
-          onClick={applyFilters} 
+          onClick={fetchFilteredHotels} 
           className="w-full bg-blue-500 text-white p-2 rounded-lg"
         >
           Apply Changes
@@ -118,7 +191,7 @@ const Explore = () => {
               />
               <div className="ml-4 flex-1">
                 <h3 className="text-xl font-bold">{hotel.name}</h3>
-                <p className="text-gray-500">{hotel.location} - <a href="#" className="text-blue-700">Show on Map</a> - {hotel.distance}KM from Downtown</p>
+                <p className="text-gray-500">{hotel.destination} - <a href="#" className="text-blue-700">Show on Map</a> - {hotel.distance}KM from Downtown</p>
                 <p className="mt-2">{hotel.description}</p>
               </div>
               <div className="flex flex-col justify-between items-end">

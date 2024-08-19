@@ -1,11 +1,13 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../../store/store';
 import { useSession, signIn } from "next-auth/react";
 import { toast, ToastContainer,Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { localhost } from '../../url';
+import { useRouter } from 'next/navigation';
+import axiosInstance from '@/utils/axios';
 
 
 const LoginForm = () => {
@@ -13,8 +15,16 @@ const LoginForm = () => {
     email: '',
     password: '',
   });
-
+  const router = useRouter()
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const { query } = router ?? {}; 
+    if (query?.error) {
+      setErrors((prevErrors) => ({ ...prevErrors, backend: query.error }));
+    }
+  }, [router]);
+  
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +51,7 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await axios.post(localhost+'/login', formData);
+      const response = await axiosInstance.post(localhost+'/login', formData);
       const { token, email, isPremium } = response.data;
   
       useAuthStore.getState().setLogin(token, email, isPremium);

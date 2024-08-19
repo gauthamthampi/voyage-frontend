@@ -11,6 +11,13 @@ import { FaHeart } from 'react-icons/fa';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useRouter} from "next/navigation"
+import { Avatar } from '@material-tailwind/react';
+import GoogleMapViewModal from './gmap';
+import axiosInstance from '@/utils/axios';
+import Rating from 'react-rating-stars-component';
+
+
+
 
 const HotelDetail = ({ id }) => {
   const [surrCategories, setsurrCategories] = useState({
@@ -21,6 +28,7 @@ const HotelDetail = ({ id }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [ownerBookingModalIsOpen, setOwnerBookingModalIsOpen] = useState(false);
   const [availabilityModalIsOpen, setAvailabilityModalIsOpen] = useState(false);
+  const [ratings, setRatings] = useState([]);
   const [selectedImage, setSelectedImage] = useState('');
   const [propertyDetails, setPropertyDetails] = useState({});
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -33,15 +41,28 @@ const HotelDetail = ({ id }) => {
   const userEmail = getEmailFromToken();
   const [isRoomAvailable, setIsRoomAvailable] = useState(false);
   const router = useRouter()
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [averageRatings, setAverageRatings] = useState(null);
+
+
+  const handleOpenMap = () => {
+    setIsMapOpen(true);
+  };
+
+  const handleCloseMap = () => {
+    setIsMapOpen(false);
+  };
 
   useEffect(() => {
     fetchHotelDetails();
     checkWishlistStatus();
+    fetchRatings();
+    fetchAverageRatings()
   }, []);
 
   const fetchHotelDetails = async () => {
     try {
-      const response = await axios.get(`${localhost}/api/getPropertyDetails/${id}`);
+      const response = await axiosInstance.get(`${localhost}/api/getPropertyDetails/${id}`);
       const data = response.data;
       setPropertyDetails(data);
       const newCategories = {
@@ -65,9 +86,30 @@ const HotelDetail = ({ id }) => {
     }
   };
 
+  const fetchRatings = async () => {
+    try {
+      const response = await axiosInstance.get(`${localhost}/api/getRatings/${id}`);
+      setRatings(response.data);
+      
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+    }
+  };
+
+  const fetchAverageRatings = async () => {
+    try {
+        const response = await axiosInstance.get(`${localhost}/api/property/${id}/average-rating`);
+        setAverageRatings(response.data);
+        console.log("avgrating",response.data);
+
+    } catch (error) {
+        console.error('Error fetching average ratings', error);
+    }
+};
+
   const checkWishlistStatus = async () => {
     try {
-      const response = await axios.get(`${localhost}/api/check-wishlist`, { params: { userEmail, propertyId: id } });
+      const response = await axiosInstance.get(`${localhost}/api/check-wishlist`, { params: { userEmail, propertyId: id } });
       setIsInWishlist(response.data.isInWishlist);
     } catch (error) {
       console.error('Error checking wishlist status:', error);
@@ -76,7 +118,7 @@ const HotelDetail = ({ id }) => {
 
   const toggleWishlistStatus = async () => {
     try {
-      const response = await axios.post(`${localhost}/api/toggle-wishlist`, { userEmail, propertyId: id });
+      const response = await axiosInstance.post(`${localhost}/api/toggle-wishlist`, { userEmail, propertyId: id });
       setIsInWishlist(response.data.isInWishlist);
       fetchHotelDetails();
       toast.success("Property added to wishlist!", {
@@ -97,7 +139,7 @@ const HotelDetail = ({ id }) => {
 
   const removeFromWishlist = async () => {
     try {
-      const response = await axios.post(`${localhost}/api/remove-from-wishlist`, { userEmail, propertyId: id });
+      const response = await axiosInstance.post(`${localhost}/api/remove-from-wishlist`, { userEmail, propertyId: id });
       setIsInWishlist(!response.data.isInWishlist);
       fetchHotelDetails();
       toast.success("Property removed from wishlist!", {
@@ -174,7 +216,6 @@ const HotelDetail = ({ id }) => {
   }
 
 
-  // Find the selected room and check guest capacity
   const selectedRoom = propertyDetails.rooms.find(room => room.category === selectedRoomCategory);
   if (selectedRoom) {
     const maxGuestsAllowed = selectedRoom.guests * numRooms;
@@ -188,7 +229,7 @@ const HotelDetail = ({ id }) => {
   }
 
   try {
-    const response = await axios.post(`${localhost}/api/check-roomAvailability`, {
+    const response = await axiosInstance.post(`${localhost}/api/check-roomAvailability`, {
       propertyId: id,
       roomCategory: selectedRoomCategory,
       checkInDate,
@@ -280,6 +321,7 @@ const HotelDetail = ({ id }) => {
                   height={400}
                   className="object-cover cursor-pointer"
                 />
+               
               </div>
             ))}
           </Carousel>
@@ -294,20 +336,116 @@ const HotelDetail = ({ id }) => {
               <FaHeart />
             </button>
           </div>
-          <p className="text-gray-500">{propertyDetails.location} - <a href="#" className="text-blue-700">See Map</a></p>
+          <p className="text-gray-500">{propertyDetails.destination} - <a href="#"  onClick={handleOpenMap} className="text-blue-700">See Map</a></p>
+          <GoogleMapViewModal
+            isOpen={isMapOpen}
+            onClose={handleCloseMap}
+            latitude={propertyDetails.location.latitude}
+            longitude={propertyDetails.location.longitude}
+          />
+         
           <p className="mt-2">{propertyDetails.description}</p>
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
-            <p className="text-2xl font-bold">8.2 Excellent</p>
-            <p className="text-gray-500">1200 reviews</p>
+            <p className="text-2xl font-bold"> {averageRatings?.overallAverage ? averageRatings.overallAverage.toFixed(1) : 'No rating'} Excellent</p>
+            <p className="text-gray-500">{ratings.length} Reviews</p>
             <div className="mt-2">
-              <p className="bg-black hover:bg-green-600 text-white p-2 rounded-md">Location 8.5</p>
-              <p className="bg-black hover:bg-yellow-600 text-white p-2 rounded-md mt-1">Cleanliness 8.1</p>
-              <p className="bg-black hover:bg-orange-600 text-white p-2 rounded-md mt-1">Service 8.3</p>
-              <p className="bg-black hover:bg-blue-600 text-white p-2 rounded-md mt-1">Facilities 8</p>
+            <p
+  className={`bg-black ${
+    averageRatings?.location >= 4
+      ? 'hover:bg-green-600'
+      : averageRatings?.location >= 3
+      ? 'hover:bg-yellow-600'
+      : averageRatings?.location >= 2
+      ? 'hover:bg-orange-600'
+      : 'hover:bg-blue-600'
+  } text-white p-2 rounded-md`}
+>
+  Location {averageRatings?.location ? averageRatings.location.toFixed(1) : 'No rating'}
+</p>
+
+<p
+  className={`bg-black ${
+    averageRatings?.cleanliness >= 4
+      ? 'hover:bg-green-600'
+      : averageRatings?.cleanliness >= 3
+      ? 'hover:bg-yellow-600'
+      : averageRatings?.cleanliness >= 2
+      ? 'hover:bg-orange-600'
+      : 'hover:bg-blue-600'
+  } text-white p-2 rounded-md mt-1`}
+>
+  Cleanliness {averageRatings?.cleanliness ? averageRatings.cleanliness.toFixed(1) : 'No rating'}
+</p>
+
+<p
+  className={`bg-black ${
+    averageRatings?.service >= 4
+      ? 'hover:bg-green-600'
+      : averageRatings?.service >= 3
+      ? 'hover:bg-yellow-600'
+      : averageRatings?.service >= 2
+      ? 'hover:bg-orange-600'
+      : 'hover:bg-blue-600'
+  } text-white p-2 rounded-md mt-1`}
+>
+  Service {averageRatings?.service ? averageRatings.service.toFixed(1) : 'No rating'}
+</p>
+
+<p
+  className={`bg-black ${
+    averageRatings?.facilities >= 4
+      ? 'hover:bg-green-600'
+      : averageRatings?.facilities >= 3
+      ? 'hover:bg-yellow-600'
+      : averageRatings?.facilities >= 2
+      ? 'hover:bg-orange-600'
+      : 'hover:bg-blue-600'
+  } text-white p-2 rounded-md mt-1`}
+>
+  Facilities {averageRatings?.facilities ? averageRatings.facilities.toFixed(1) : 'No rating'}
+</p>
+
             </div>
           </div>
+          <div className="mt-4 p-2 bg-gray-100 rounded-lg shadow-md w-full">
+      <h3 className="text-lg font-bold mb-4">User Reviews</h3>
+      <Carousel
+        showThumbs={false}
+        autoPlay={true}
+        infiniteLoop={true}
+        emulateTouch={true}
+        interval={5000}
+        className="overflow-hidden"
+      >
+        {ratings.map((rating, index) => (
+          <div key={index} className="p-4 bg-white rounded-lg shadow-md flex items-start">
+            <div className="w-12 h-12 flex-shrink-0">
+              <img
+                alt={rating.userName}
+                src={rating.userPhoto ? rating.userPhoto : '/images/defaultdp.jpg'}
+                width={48} 
+                height={48}
+                className="rounded-full object-cover w-full h-full"
+              />
+            </div>
+            <div className="ml-3"> 
+              <span className="font-semibold text-sm">{rating.userName}</span>
+              <Rating
+                count={5}
+                value={rating.rating.average}
+                size={20}
+                edit={false}
+                activeColor="#ffd700"
+              />
+              <p className="text-gray-700 text-sm mt-1 block"><em>"{rating.review}"</em></p>
+            </div>
+          </div>
+        ))}
+      </Carousel>
+    </div>
+
         </div>
-      </div>
+      </div>    
       <div className="mt-4 p-4 bg-gray-100 rounded-lg shadow-md">
         <h3 className="text-xl font-bold">Facilities</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
@@ -350,9 +488,7 @@ const HotelDetail = ({ id }) => {
           </tbody>
         </table>
       </div>
-      <div className="mt-4 p-4 bg-gray-100 rounded-lg shadow-md">
-        <h3 className="text-xl font-bold">User Reviews</h3>
-      </div>
+     
       <div className="mt-4 p-4 bg-gray-100 rounded-lg shadow-md">
       <h3 className="text-xl font-bold">Hotel Surroundings</h3>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">

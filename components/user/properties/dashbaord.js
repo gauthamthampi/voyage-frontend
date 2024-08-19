@@ -11,10 +11,11 @@ import {
   Legend,
 } from 'chart.js';
 import { localhost } from '@/url';
+import getEmailFromToken from '@/utils/decode';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const AdminDashboard = () => {
+const Dashboard = () => {
   const [properties, setProperties] = useState(0);
   const [totalBookings, setTotalBookings] = useState(0);
   const [totalGross, setTotalGross] = useState(0);
@@ -22,12 +23,16 @@ const AdminDashboard = () => {
   const [chartData, setChartData] = useState([]);
   const [topHotels, setTopHotels] = useState([]);
   const [trendingDestinations, setTrendingDestinations] = useState([]);
+  const userEmail = getEmailFromToken()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(localhost+'/api/admin/Dashboard');
+        const response = await axios.get(localhost+'/api/property/Dashboard', {
+          params: { userEmail },
+        });
         const data = response.data;
+        console.log(response.data);
         
         setProperties(data.properties);
         setTotalBookings(data.totalBookings);
@@ -42,7 +47,7 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [userEmail]);
 
   const barChartData = {
     labels: chartData.map(item => item.month),
@@ -112,4 +117,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default Dashboard;

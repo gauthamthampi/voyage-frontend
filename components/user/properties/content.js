@@ -1,8 +1,9 @@
 import React from 'react';
 import MyProperties from './myproperties';
 import InboxProperties from './inbox';
-import Reviews from './reviews';
+import Dashboard from './dashbaord';
 import BookingsProperties from './bookings';
+import Blogs from './blogs'
 
 
 
@@ -11,7 +12,8 @@ const ContentProperties = ({ selectedItem }) => {
     'Item 1': <MyProperties/>,
     'Item 2': <InboxProperties />,
     'Item 3': <BookingsProperties />,
-    'Item 4': <Reviews />,
+    'Item 4': <Dashboard />,
+    'Item 5': <Blogs />
   };
 
   return (

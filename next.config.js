@@ -7,14 +7,13 @@ const nextConfig = {
     },
     reactStrictMode: true,
     images: {
-        remotePatterns: [
-          {
-            protocol: 'http',
-            hostname: 'localhost',
+            domains: [
+              'localhost',
+              's3.eu-north-1.amazonaws.com'
+            ],
           },
-        ],
-      },
-  };
+        }
+        
   
 module.exports = nextConfig
   

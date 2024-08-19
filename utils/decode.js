@@ -7,10 +7,11 @@ const getEmailFromToken = () => {
   const token = localStorage.getItem('usertoken');
   if (!token) {
     router.push("/login")
-    // throw new Error('No token found');
+  }else{
+    const decoded = jwtDecode(token);
+    return decoded.email;
   }
-  const decoded = jwtDecode(token);
-  return decoded.email;
+  
 };
 
 export default getEmailFromToken;

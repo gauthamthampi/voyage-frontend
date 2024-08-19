@@ -3,6 +3,7 @@ import {useRouter} from 'next/navigation'
 import { Encode_Sans,Montserrat} from 'next/font/google';
 import axios from 'axios';
 import { localhost } from '../../../url';
+import axiosInstance from '@/utils/axios';
 
 export const encode_sans = Encode_Sans({
     subsets: ['latin'],
@@ -25,7 +26,7 @@ const AllDestinationsPage = () => {
     useEffect(() => {
       const fetchDestinations = async () => {
         try {
-          const response = await axios.get(localhost+'/api/getUserDestinations');
+          const response = await axiosInstance.get(localhost+'/api/getUserDestinations');
           const data = response.data;
           setDestinations(data);
           setFilteredDestinations(data);

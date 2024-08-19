@@ -15,18 +15,18 @@ export const encode_sans = Encode_Sans({
     weight: '400', 
   });
 
-const TrendingDestinations = () => {
-  const [destinations, setDestinations] = useState([]);
+const PropertySugg = () => {
+  const [properties, setProperties] = useState([]);
   const router = useRouter()
 
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const response = await axiosInstance.get(localhost+'/api/getUserDestinations');
+        const response = await axiosInstance.get(localhost + '/api/getAllProperties');
         const data = response.data;
         console.log(data+"data");
         if (Array.isArray(data)) {
-            setDestinations(data.slice(0, 4)); // Limit to 4 destinations
+            setProperties(data.slice(0, 4)); 
           } else {
             console.error('Invalid data structure:', data);
           }      
@@ -38,18 +38,18 @@ const TrendingDestinations = () => {
     fetchDestinations();
   }, []);
    
-  const handleDestinationClick = (name) => {
-    router.push(`/destination/${name}`);
+  const handleDestinationClick = (id) => {
+    router.push(`/hotel/${id}`);
   };
 
   const handleSeeAllClick = () => {
-    router.push('/exploredestination');
+    router.push('/explore');
   };
 
   return (
     <div className="py-8">
     <div className="flex justify-between items-center mx-20 my-8">
-      <h2 className={`text-2xl font-thin ${encode_sans.className}`}>TRENDING DESTINATIONS</h2>
+      <h2 className={`text-2xl font-thin ${encode_sans.className}`}>PROPERTIES YOU MAY LIKE</h2>
       <button 
         onClick={handleSeeAllClick} 
         className="text-blue-500 hover:underline"
@@ -58,18 +58,18 @@ const TrendingDestinations = () => {
       </button>
     </div>
     <div className="flex mx-20 gap-20">
-      {destinations.map((destination, index) => (
+      {properties.map((property, index) => (
         <div 
           key={index} 
           className="text-center transition-transform transform hover:scale-105 cursor-pointer"
-          onClick={() => handleDestinationClick(destination.name)}
+          onClick={() => handleDestinationClick(property._id)}
         >
           <img
-            src={`${localhost}/uploads/${destination.coverPhoto}`}
-            alt={destination.name}
+            src={`${localhost}/uploads/${property.photos[0]}`}
+            alt={property.name}
             className="rounded-lg w-64 h-40 object-cover"
           />
-          <p className={`mt-2 text-lg font-semibold ${zenDots.className}`}>{destination.name}</p>
+          <p className={`mt-2 text-lg font-semibold ${zenDots.className}`}>{property.name}</p>
         </div>
       ))}
     </div>
@@ -78,4 +78,4 @@ const TrendingDestinations = () => {
   );
 };
 
-export default TrendingDestinations;
+export default PropertySugg;

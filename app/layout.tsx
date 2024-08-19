@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionProviderClient from "../lib/SessionProviderCient"
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import  ErrorBoundary  from "../components/error/errorBoundary.js";
+
 
  
 const inter = Inter({ subsets: ["latin"] });

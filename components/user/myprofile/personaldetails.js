@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 import { useAuthStore } from '../../../store/store';
 import Modal from './modal';
 import FormField from './formfield';
@@ -13,7 +13,8 @@ const PersonalDetails = () => {
   const [editField, setEditField] = useState('');
   const [countryList, setCountryList] = useState([]);
   const [profilePic, setProfilePic] = useState('');
-  const setloggedEmail = useAuthStore(state => state.setloggedEmail);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);  // State for image modal
+  const setloggedEmail = useAuthStore((state) => state.setloggedEmail);
   const fileInputRef = useRef(null);
   const userEmail = getEmailFromToken();
 
@@ -21,7 +22,7 @@ const PersonalDetails = () => {
     const fetchUserDetails = async () => {
       if (userEmail) {
         try {
-          const response = await axios.get(`${localhost}/user/getuser?email=${userEmail}`);
+          const response = await axiosInstance.get(`${localhost}/user/getuser?email=${userEmail}`);
           setUserDetails(response.data);
           setProfilePic(response.data.profilePic || ''); 
         } catch (error) {
@@ -36,8 +37,8 @@ const PersonalDetails = () => {
   useEffect(() => {
     const fetchCountryList = async () => {
       try {
-        const response = await axios.get('https://restcountries.com/v3.1/all');
-        const countries = response.data.map(country => country.name.common);
+        const response = await axiosInstance.get('https://restcountries.com/v3.1/all');
+        const countries = response.data.map((country) => country.name.common);
         setCountryList(countries.sort());
       } catch (error) {
         console.error('Error fetching country list:', error);
@@ -58,13 +59,9 @@ const PersonalDetails = () => {
   };
 
   const handleSave = async (updatedValue) => {
-    const token = localStorage.getItem('usertoken');
-    const decodedToken = jwtDecode(token);
-    const userEmail = decodedToken.email;
-
     try {
       const requestBody = { email: userEmail, [editField]: updatedValue };
-      const response = await axios.put(`${localhost}/user/updateuser`, requestBody);
+      const response = await axiosInstance.put(`${localhost}/user/updateuser`, requestBody);
       setUserDetails(response.data);
       if (editField === 'profilePic') {
         setProfilePic(updatedValue);
@@ -87,9 +84,9 @@ const PersonalDetails = () => {
     const formData = new FormData();
     formData.append('profilePic', file);
     formData.append('email', userEmail);
-    console.log(userEmail);
+
     try {
-      const response = await axios.put(`${localhost}/user/uploadprofilepic`, formData, {
+      const response = await axiosInstance.put(`${localhost}/user/uploadprofilepic`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -100,8 +97,6 @@ const PersonalDetails = () => {
       console.error('Error uploading profile picture:', error);
     }
   };
-
-  
 
   return (
     <>
@@ -114,22 +109,22 @@ const PersonalDetails = () => {
           <img
             src={profilePic || '/images/defaultdp.jpg'}
             alt='Profile'
-            className='w-16 h-16 rounded-full object-cover'
+            className='w-16 h-16 rounded-full object-cover cursor-pointer'
+            onClick={() => setIsImageModalOpen(true)}  // Open image modal on click
           />
-        <button className='absolute bottom-0 right-0 bg-blue-700 text-white rounded-full p-1'>
-  <label htmlFor='profilePicUpload' className='cursor-pointer'>
-    +
-  </label>
-  <input
-    type='file'
-    id='profilePicUpload'
-    accept='image/*'
-    className='hidden'
-    onChange={handleProfilePicUpload}
-  />
-</button>
+          <button className='absolute bottom-0 right-0 bg-blue-700 text-white rounded-full p-1'>
+            <label htmlFor='profilePicUpload' className='cursor-pointer'>+</label>
+            <input
+              type='file'
+              id='profilePicUpload'
+              accept='image/*'
+              className='hidden'
+              onChange={handleProfilePicUpload}
+            />
+          </button>
         </div>
       </div>
+      
       <div className="flex justify-between items-center p-3 text-base border-b-2">
         <p className="flex-1 px-6">Firstname</p>
         <p className="flex-1 text-center">{userDetails.name}</p>
@@ -170,6 +165,27 @@ const PersonalDetails = () => {
           {userDetails.gender ? 'Edit' : 'Add'}
         </p>
       </div>
+
+      {isImageModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-4 shadow-lg max-w-sm mx-4">
+            <div className="flex justify-end">
+              <button 
+                onClick={() => setIsImageModalOpen(false)}  // Close image modal
+                className="text-gray-600 hover:text-gray-900 text-lg font-semibold">
+                &times;
+              </button>
+            </div>
+            <div className="mt-4">
+              <img 
+                src={profilePic || '/images/defaultdp.jpg'} 
+                alt="Profile" 
+                className="rounded-lg max-w-full h-auto"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalOpen && (
         <Modal onClose={closeModal}>

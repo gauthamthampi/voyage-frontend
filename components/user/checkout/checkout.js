@@ -1,11 +1,13 @@
 'use client'
 import { localhost } from '@/url';
 import axios from 'axios';
+import axiosInstance from '../../../utils/axios';
 import { useRouter,useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BookingConfirmation from '../bookingconfirmation/confirm';
+import CouponModal from './couponmodal'; 
 
 const Checkout = () => {
   const router = useRouter();
@@ -21,14 +23,27 @@ const Checkout = () => {
   const roomId = searchParams.get('roomId');
   const userEmail = searchParams.get('userEmail');
   const [bookingDetails, setBookingDetails] = useState(null);
+  const [isCouponModalOpen, setCouponModalOpen] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [coupons, setCoupons] = useState([]); 
+  const [totalAmountToPay, setTotalAmountToPay] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0); 
+
 
 
 
   const fetchHotelDetails = async ()=>{
-    const response = await axios.get(`${localhost}/api/checkout/getHotelDetails`, { params: { roomId } })
+    const response = await axiosInstance.get(`${localhost}/api/checkout/getHotelDetails`, { params: { roomId } })
     console.log(response.data);
     setHotelDetails(response.data.hotel)
     setRoomDetails(response.data.room)
+  }
+
+  const fetchCouponDetails = async()=>{    
+    const response = await axiosInstance.get(localhost+'/api/getUserCoupons', {params:{userEmail}})
+    console.log(response.data,"coup");
+    setCoupons(response.data.coupons)
+    
   }
 
   const calculateDays = (checkInDate, checkOutDate) => {
@@ -39,17 +54,65 @@ const Checkout = () => {
     return differenceInDays;
   };
 
-  useEffect(()=>{
-    fetchHotelDetails()
+  const calculateTotalAmount = async() => {
+    const numberOfDays = calculateDays(checkInDate, checkOutDate);
+    const price = roomDetails.price * numberOfDays * rooms;    
+    setTotalPrice(price); // Set the original price
+
+    let totalAmount = price + 100; // Including fixed tax/charges
+    console.log(appliedCoupon,"app");
+    
+    if (appliedCoupon) {
+      const discountAmount = (totalAmount * appliedCoupon.discountValue) / 100;
+      totalAmount -= discountAmount;
+    }
+
+    setTotalAmountToPay(totalAmount); 
+  };
+
+  const handleCouponModalOpen = () => setCouponModalOpen(true);
+  const handleCouponModalClose = () => setCouponModalOpen(false);
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    calculateTotalAmount();
+
+  };
+
+  const handleApplyCoupon = (coupon) => {
+    setAppliedCoupon(coupon);
+    calculateTotalAmount();
+
+  };
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        await fetchHotelDetails(); 
+        await fetchCouponDetails(); 
+      } catch (error) {
+        console.error("Error fetching details:", error);
+      }
+    };
+  
+    fetchDetails();
+  
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
-
+  
     return () => {
-        document.body.removeChild(script);
+      document.body.removeChild(script);
     };
-  },[])
+  }, []); 
+  
+  useEffect(() => {
+    if (roomDetails && roomDetails.price) {
+      calculateTotalAmount();
+    }
+  }, [roomDetails, appliedCoupon, checkInDate, checkOutDate, rooms]); 
+  
   
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
@@ -57,11 +120,6 @@ const Checkout = () => {
   const [countryCode, setCountryCode] = useState('+1'); 
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-const numberOfDays = calculateDays(checkInDate, checkOutDate);
-const totalPrice = roomDetails.price * numberOfDays;
-const totalAmountToPay = totalPrice + 100; 
-// const totalAmountToPay = 10; 
 
 
   const validate = (trimmedName) => {
@@ -83,12 +141,6 @@ const totalAmountToPay = totalPrice + 100;
       setErrors(newErrors);
       return;
     }
-  
-    const numberOfDays = calculateDays(checkInDate, checkOutDate);
-    const totalPrice = roomDetails.price * numberOfDays;
-    const totalAmountToPay = totalPrice + 100; 
-    // const totalAmountToPay = 10; 
-
 
     
     let paymentMethod;
@@ -133,7 +185,7 @@ const totalAmountToPay = totalPrice + 100;
       }
   
       const data = await res.json();
-  
+      
       const options = {
         key_id: 'rzp_test_EnGfdFv0m1DG7S',
         amount: data.amount,
@@ -152,7 +204,7 @@ const totalAmountToPay = totalPrice + 100;
               paymentMethod,
               paymentDate:bookingDate,
               paymentStatus,
-              noofdays:numberOfDays,
+              noofdays:calculateDays(checkInDate, checkOutDate),
               propertyId:hotelDetails._id,
               checkInDate,
               checkOutDate,
@@ -160,11 +212,13 @@ const totalAmountToPay = totalPrice + 100;
               rooms,
               roomId,
               amount: totalAmountToPay,
-              bookingDate
+              bookingDate,
+              coupon: appliedCoupon ? { id: appliedCoupon._id } : undefined 
             };
+            
             setShowSuccessModal(true);
             setBookingDetails(bookingData)
-            const result = await axios.post(`${localhost}/api/createbooking`, bookingData);
+            const result = await axiosInstance.post(`${localhost}/api/createbooking`, bookingData);
   
             if (result.data.success) {
               setShowSuccessModal(true);
@@ -281,9 +335,32 @@ const totalAmountToPay = totalPrice + 100;
             <option value="cod">Cash on Delivery</option>
           </select>
         </div>
+        {appliedCoupon ? (
+          <button
+            onClick={handleRemoveCoupon}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 "
+          >
+            Coupon Applied
+            <span className="ml-2 cursor-pointer">×</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleCouponModalOpen}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Apply Coupon
+          </button>
+        )}
+      {isCouponModalOpen && (
+        <CouponModal
+          coupons={coupons} // Pass the user's coupons to the modal
+          onClose={handleCouponModalClose}
+          onApply={handleApplyCoupon}
+        />
+      )}
         <button
           onClick={handlePayment}
-          className="bg-blue-500 text-white p-2 rounded-lg"
+          className="bg-blue-500 text-white p-2 rounded-lg ml-5"
         >
           Proceed to Payment
         </button>

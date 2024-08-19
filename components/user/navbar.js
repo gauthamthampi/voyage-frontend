@@ -30,11 +30,10 @@ const Navbar = () => {
             <a href="/"><img src="/images/logo.png" className="h-24 w-24" alt="Logo" /> </a>
           </div>
 
-          {/* Middle Menu Items */}
           <div className="hidden md:flex space-x-6">
             <a href="/exploredestination" className="text-gray-200 hover:text-white hover:scale-110 transition-transform duration-200 ease-in-out transform">DESTINATIONS</a>
             <a href="/explore" className="text-gray-200 hover:text-white hover:scale-110 transition-transform duration-200 ease-in-out transform">EXPLORE</a>
-            <a href="#" className="text-gray-200 hover:text-white hover:scale-110 transition-transform duration-200 ease-in-out transform">READ</a>
+            <a href="/blogs" className="text-gray-200 hover:text-white hover:scale-110 transition-transform duration-200 ease-in-out transform">READ</a>
             <a href="#" className="text-gray-200 hover:text-white hover:scale-110 transition-transform duration-200 ease-in-out transform">PLAN</a>
           </div>
 

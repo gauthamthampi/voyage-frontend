@@ -42,7 +42,7 @@ const Properties = () => {
       property.description.toLowerCase().includes(searchValue)
     );
     setFilteredProperties(filtered);
-    setCurrentPage(1); // Reset to the first page on search
+    setCurrentPage(1); 
   };
 
   const handlePageChange = (page) => {
@@ -137,7 +137,7 @@ const Properties = () => {
             <tr className='bg-gray-200'>
               <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Cover Photo</th>
               <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-              <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Description</th>
+              <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Owner</th>
               <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Status</th>
               <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Actions</th>
             </tr>
@@ -149,7 +149,7 @@ const Properties = () => {
                   <img src={`${localhost}/uploads/${property.photos[0]}`} alt="Destination Cover" className='w-20 h-auto' />
                 </td>
                 <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{property.name}</td>
-                <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{property.description}</td>
+                <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{property.email}</td>
                 <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{property.status ? 'Active' : 'Inactive'}</td>
                 <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>
                   <button

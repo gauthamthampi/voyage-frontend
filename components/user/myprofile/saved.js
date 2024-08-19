@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer,Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axiosInstance from '@/utils/axios';
 
 const Saved = () => {
   const [wishlistProperties, setWishlistProperties] = useState([]);
@@ -19,7 +20,7 @@ const Saved = () => {
 
   const fetchWishlistProperties = async () => {
     try {
-      const response = await axios.get(`${localhost}/api/get-wishlist`, { params: { userEmail } });
+      const response = await axiosInstance.get(`${localhost}/api/get-wishlist`, { params: { userEmail } });
       setWishlistProperties(response.data);
       console.log(response.data);
     } catch (error) {
@@ -29,7 +30,7 @@ const Saved = () => {
 
   const removeFromWishlist = async (propertyId) => {
     try {
-      await axios.post(`${localhost}/api/remove-from-wishlist`, { userEmail, propertyId });
+      await axiosInstance.post(`${localhost}/api/remove-from-wishlist`, { userEmail, propertyId });
       fetchWishlistProperties(); // Refresh the list after removal
       toast.success(`Property removed from wishlist!`, {
         position: "top-right",

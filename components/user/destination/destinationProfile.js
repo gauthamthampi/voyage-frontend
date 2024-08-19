@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Cormorant, Montserrat } from 'next/font/google';
 import { localhost } from '../../../url';
+import axiosInstance from '@/utils/axios';
 
 
 export const zenDots = Montserrat({
@@ -21,7 +22,7 @@ const DestinationProfile = ({ name }) => {
   useEffect(() => {
     const fetchDestination = async () => {
       try {
-        const response = await axios.get(`${localhost}/destinations/${name}`);
+        const response = await axiosInstance.get(`${localhost}/destinations/${name}`);
         setDestination(response.data);
       } catch (error) {
         setError('Error fetching destination');

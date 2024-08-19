@@ -15,7 +15,7 @@ const MyProperties = () => {
     return (
         <>
         <Navbar />
-        <h2 className=" m-7 font-sans text-2xl font-bold text-center">My Properties</h2>
+        <h2 className=" m-7 font-sans text-2xl font-bold text-center">Premium Panel</h2>
         <div className="flex mx-20">
       <div className="w-1/4 bg-gray-100 ">
         <SidebarProperties onItemClick={handleItemClick} />

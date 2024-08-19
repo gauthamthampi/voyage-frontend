@@ -7,6 +7,8 @@ import { useAuthStore } from "../store/store.js";
 import Footer from "../components/user/footer.js"
 import MiddleBanner from '../components/user/homepage/middlebanner.js'
 import TrendingDestinations from '../components/user/homepage/row1.js'
+import PropertySugg from '../components/user/homepage/row2.js'
+
 
 const Home = () => {
   const { data: session } = useSession();
@@ -25,6 +27,7 @@ const Home = () => {
       <Navbar />
       <BannerFront />
       <TrendingDestinations />
+      <PropertySugg />
       <MiddleBanner />
       <Footer />
     </>

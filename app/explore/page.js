@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from '@/components/user/navbar'
+import Navbar from '../../components/user/navbar'
 import Explore from '../../components/user/explore/page'
 
 function ExplorePage() {

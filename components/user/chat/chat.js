@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { useParams, useRouter } from 'next/navigation';
@@ -16,11 +16,13 @@ const ChatPage = () => {
   const [sidebarChats, setSidebarChats] = useState([]); // New state for sidebar chats
   const [receiverDetails, setReceiverDetails] = useState({}); // New state for receiver details
   const [userStatus, setUserStatus] = useState('Offline'); // Status for header
+  const [notifications, setNotifications] = useState([]);
+
 
   useEffect(() => {
     if (senderEmail) {
       const socketInstance = io('http://localhost:3001', {
-        query: { email: senderEmail } 
+        query: { email: senderEmail },
       });
       setSocket(socketInstance);
 
@@ -34,12 +36,14 @@ const ChatPage = () => {
 
       socketInstance.on('updateUserStatus', ({ email, online }) => {
         if (email === receiverEmail) {
-          setUserStatus(online ? 'Online' : `Last seen: ${new Date().toLocaleTimeString()}`);
+          setUserStatus(
+            online ? 'Online' : `Last seen: ${new Date().toLocaleTimeString()}`
+          );
         }
-      });
+   });
 
       return () => {
-        socketInstance.emit('userOffline', senderEmail); 
+        socketInstance.emit('userOffline', senderEmail);
         socketInstance.disconnect();
       };
     }
@@ -54,7 +58,7 @@ const ChatPage = () => {
       socketInstance.emit('joinRoom', room);
 
       socketInstance.on('message', (message) => {
-        console.log('Message received:', message); 
+        console.log('Message received:', message);
         setMessages((prevMessages) => [...prevMessages, message]);
       });
 
@@ -65,7 +69,11 @@ const ChatPage = () => {
       socketInstance.emit('getUserDetails', receiverEmail);
       socketInstance.on('userDetails', (details) => {
         setReceiverDetails(details);
-        setUserStatus(details.online ? 'Online' : `Last seen: ${new Date(details.lastSeen).toLocaleTimeString()}`);
+        setUserStatus(
+          details.online
+            ? 'Online'
+            : `Last seen: ${new Date(details.lastSeen).toLocaleTimeString()}`
+        );
       });
 
       socketInstance.emit('markMessagesAsRead', { senderEmail, receiverEmail });
@@ -75,6 +83,31 @@ const ChatPage = () => {
       };
     }
   }, [receiverEmail, senderEmail]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('notifyNewMessage', (notification) => {
+        console.log("Received notification:", notification);
+        setNotifications(notification);
+      });
+    }
+  
+    return () => {
+      if (socket) {
+        socket.off('notifyNewMessage');
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (notifications.length > 0) {
+      setTimeout(() => {
+        setNotifications([]);
+      }, 5000); // Clear notifications after 5 seconds
+    }
+  }, [notifications]);
+  
+  
 
   const sendMessage = () => {
     if (socket && senderEmail && receiverEmail) {
@@ -98,7 +131,10 @@ const ChatPage = () => {
         <ul>
           {sidebarChats.map((chat, index) => (
             <li key={index} className="mb-2 relative">
-              <a onClick={() => openChat(chat.email)} className="flex items-center space-x-2 cursor-pointer">
+              <a
+                onClick={() => openChat(chat.email)}
+                className="flex items-center space-x-2 cursor-pointer"
+              >
                 <img
                   src={chat.profilePic || '/images/defaultdp.jpg'}
                   alt="Profile"
@@ -106,7 +142,9 @@ const ChatPage = () => {
                 />
                 <div>
                   <div className="font-semibold">{chat.name}</div>
-                  <div className="text-sm text-gray-600 truncate">{chat.lastMessage}</div>
+                  <div className="text-sm text-gray-600 truncate">
+                    {chat.lastMessage}
+                  </div>
                 </div>
               </a>
               {chat.newMessageCount > 0 && (
@@ -130,7 +168,9 @@ const ChatPage = () => {
               className="w-12 h-12 rounded-full mr-4"
             />
             <div>
-              <h1 className="text-xl font-bold">{receiverDetails.name || 'User'}</h1>
+              <h1 className="text-xl font-bold">
+                {receiverDetails.name || 'User'}
+              </h1>
               <div className="text-sm">{receiverEmail}</div>
             </div>
           </div>
@@ -141,7 +181,12 @@ const ChatPage = () => {
         <div className="flex-1 overflow-auto p-4 bg-gray-100">
           <div className="flex flex-col space-y-4">
             {messages.map((msg, index) => (
-              <div key={index} className={`flex items-start ${msg.sender === senderEmail ? 'justify-end' : 'justify-start'}`}>
+              <div
+                key={index}
+                className={`flex items-start ${
+                  msg.sender === senderEmail ? 'justify-end' : 'justify-start'
+                }`}
+              >
                 {msg.sender !== senderEmail && (
                   <img
                     src={msg.profilePic || '/images/defaultdp.jpg'}
@@ -149,9 +194,13 @@ const ChatPage = () => {
                     className="w-8 h-8 rounded-full m-2"
                   />
                 )}
-                <div className={`p-2 rounded-lg max-w-xs ${
-                  msg.sender === senderEmail ? 'bg-blue-500 text-white self-end' : 'bg-gray-200 text-black self-start'
-                }`}>
+                <div
+                  className={`p-2 rounded-lg max-w-xs ${
+                    msg.sender === senderEmail
+                      ? 'bg-blue-500 text-white self-end'
+                      : 'bg-gray-200 text-black self-start'
+                  }`}
+                >
                   <div>{msg.text}</div>
                 </div>
                 {msg.sender === senderEmail && (
@@ -184,6 +233,22 @@ const ChatPage = () => {
           </div>
         </div>
       </div>
+      {notifications && (
+  <div className="fixed top-5 right-5 z-50">
+{notifications.length > 0 && (
+  <div className="fixed top-5 right-5 z-50">
+    {notifications.map((notif, index) => (
+      <div key={index} className="bg-red-500 text-white p-2 mb-2 rounded shadow-lg">
+        <strong>New message from {notif.sender}</strong>: {notif.text}
+      </div>
+    ))}
+  </div>
+)}
+
+
+  </div>
+)}
+
     </div>
   );
 };

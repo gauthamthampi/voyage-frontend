@@ -8,6 +8,7 @@ import { useAuthStore } from "../../../store/store"
 import { jwtDecode } from 'jwt-decode';
 import { set } from 'date-fns';
 import { localhost } from '../../../url';
+import axiosInstance from '@/utils/axios';
 
 const Subscriptions = () => {
     const router = useRouter();
@@ -20,7 +21,7 @@ const Subscriptions = () => {
     const closeModal = () => setIsModalOpen(false);
     const handleCancel = async() => {
     try{
-        const result = await axios.put(localhost+"/api/cancelPremium",{
+        const result = await axiosInstance.put(localhost+"/api/cancelPremium",{
             email:Email
         })
         if (result.data.success) {

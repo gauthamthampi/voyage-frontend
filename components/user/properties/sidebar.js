@@ -11,24 +11,31 @@ const SidebarProperties = ({ onItemClick }) => {
           Properties
         </li>
         <li 
-          onClick={() => onItemClick('Item 2')} 
-          className="cursor-pointer p-4 hover:bg-gray-200"
-        >
-          Messages
-        </li>
-        <li 
           onClick={() => onItemClick('Item 3')} 
           className="cursor-pointer p-4 hover:bg-gray-200"
         >
           Bookings
         </li>
         <li 
+          onClick={() => onItemClick('Item 2')} 
+          className="cursor-pointer p-4 hover:bg-gray-200"
+        >
+          Messages
+        </li>
+      
+        <li 
           onClick={() => onItemClick('Item 4')} 
           className="cursor-pointer p-4 hover:bg-gray-200"
         >
-          Reviews
+          Dashboard
         </li>
-        {/* Add more list items for other items */}
+
+        <li 
+          onClick={() => onItemClick('Item 5')} 
+          className="cursor-pointer p-4 hover:bg-gray-200"
+        >
+          Blogs
+        </li>
       </ul>
     </div>
   );

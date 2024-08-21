@@ -15,6 +15,7 @@ import { Avatar } from '@material-tailwind/react';
 import GoogleMapViewModal from './gmap';
 import axiosInstance from '@/utils/axios';
 import Rating from 'react-rating-stars-component';
+import { useAuthStore } from '@/store/store';
 
 
 
@@ -43,7 +44,7 @@ const HotelDetail = ({ id }) => {
   const router = useRouter()
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [averageRatings, setAverageRatings] = useState(null);
-
+  const setCheckoutDetails = useAuthStore((state) => state.setCheckoutDetails);
 
   const handleOpenMap = () => {
     setIsMapOpen(true);
@@ -289,17 +290,30 @@ const HotelDetail = ({ id }) => {
       return;
     }
   
-    const queryParams = new URLSearchParams({
-      roomCategory: selectedRoomCategory,
-      hotelname: hotelname,
-      checkInDate,
-      checkOutDate,
-      travellers: numTravellers,
-      rooms: numRooms,
-      roomId: selectedRoom._id,
-      userEmail: userEmail,
-    }).toString();
-    router.push(`/checkout?${queryParams}`);
+  //   const queryParams = new URLSearchParams({
+  //     roomCategory: selectedRoomCategory,
+  //     hotelname: hotelname,
+  //     checkInDate,
+  //     checkOutDate,
+  //     travellers: numTravellers,
+  //     rooms: numRooms,
+  //     roomId: selectedRoom._id,
+  //     userEmail: userEmail,
+  //   }).toString();
+  //   router.push(`/checkout?${queryParams}`);
+  const checkoutData = {
+    roomCategory: selectedRoomCategory,
+    hotelname: hotelname,
+    checkInDate,
+    checkOutDate,
+    travellers: numTravellers,
+    rooms: numRooms,
+    roomId: selectedRoom._id,
+    userEmail: userEmail,
+  };
+
+  setCheckoutDetails(checkoutData);
+  router.push('/checkout');
   };
   
   if (!propertyDetails.name) {

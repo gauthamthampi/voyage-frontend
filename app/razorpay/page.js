@@ -1,7 +1,7 @@
 // components/Payment.js
 'use client'
 import React, { useState, useEffect } from 'react';
-import razorpay from '../../lib/razorpay';
+import razorpay from 'razorpay';
 
 const Payment = () => {
   const [razorpayOrder, setRazorpayOrder] = useState(null);

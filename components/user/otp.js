@@ -126,7 +126,7 @@ import { toast, ToastContainer,Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { localhost } from '../../url';
 
-const VerifyOtp = () => {
+const Otp = () => {
   const [otp, setOtp] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -177,7 +177,6 @@ const VerifyOtp = () => {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
     <section className="bg-white dark:bg-gray-900">
       <div className="container flex items-center justify-center min-h-screen px-6 pb-10">
         <form className="w-full max-w-md" onSubmit={handleSubmit}>
@@ -204,9 +203,16 @@ const VerifyOtp = () => {
         </form>
       </div>
     </section>
-    </Suspense>
   );
  
 };
+
+const  VerifyOtp = () =>{
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Otp />
+      </Suspense>
+  )
+}
 
 export default VerifyOtp;

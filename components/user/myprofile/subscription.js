@@ -258,7 +258,7 @@ const Subscriptions = () => {
               <span role="img" aria-label="thumbs up">👍</span>
             </div>
             <h1 className="text-2xl font-semibold mb-2">You’re already subscribed!</h1>
-            <p className="text-lg mb-6">We're glad you're interested in VOYAGE! Enjoy your membership.</p>
+            <p className="text-lg mb-6">We&apos;re glad you&apos;re interested in VOYAGE! Enjoy your membership.</p>
             <div className="flex justify-center space-x-4 mb-4">
               <button className="bg-black text-white py-2 px-4 rounded hover:bg-red-600 hover:text-white" onClick={openModal}>Cancel Subscription</button>
             </div>

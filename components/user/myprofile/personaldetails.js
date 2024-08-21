@@ -103,8 +103,8 @@ const PersonalDetails = () => {
       <div className='p-2 border-b-2 flex justify-between items-center'>
         <div>
           <p className='px-6 pt-3 text-lg font-bold'>Personal Details</p>
-          <p className='px-6 text-sm font-light'>Update your information and find out how it's used.</p>
-        </div>
+          <p className='px-6 text-sm font-light'>Update your information and find out how it&apos;s used.</p>
+          </div>
         <div className='relative'>
           <img
             src={profilePic || '/images/defaultdp.jpg'}

@@ -451,7 +451,7 @@ const HotelDetail = ({ id }) => {
                 edit={false}
                 activeColor="#ffd700"
               />
-              <p className="text-gray-700 text-sm mt-1 block"><em>"{rating.review}"</em></p>
+              <p className="text-gray-700 text-sm mt-1 block"><em>&quot;{rating.review}&quot;</em></p>
             </div>
           </div>
         ))}

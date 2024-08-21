@@ -610,7 +610,7 @@ function MyProperties() {
       >
         <option value=''>Select a category</option>
         <option value='Things nearby'>Things nearby</option>
-        <option value="Cafe's and Restaurants">Cafe's and Restaurants</option>
+        <option value="Cafe's and Restaurants">Cafe&apos;s and Restaurants</option>
         <option value='Transportation'>Transportation</option>
       </select>
       <input

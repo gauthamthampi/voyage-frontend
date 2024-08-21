@@ -118,7 +118,7 @@
 // export default VerifyOtp;
 
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../store/store';
@@ -177,6 +177,7 @@ const VerifyOtp = () => {
   };
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <section className="bg-white dark:bg-gray-900">
       <div className="container flex items-center justify-center min-h-screen px-6 pb-10">
         <form className="w-full max-w-md" onSubmit={handleSubmit}>
@@ -203,7 +204,9 @@ const VerifyOtp = () => {
         </form>
       </div>
     </section>
+    </Suspense>
   );
+ 
 };
 
 export default VerifyOtp;

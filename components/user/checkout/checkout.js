@@ -2,7 +2,7 @@
 import { localhost } from '@/url';
 import axios from 'axios';
 import axiosInstance from '../../../utils/axios';
-import { useRouter,useSearchParams } from 'next/navigation';
+import { useRouter, } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,17 +12,8 @@ import { useAuthStore } from '@/store/store';
 
 const Checkout = () => {
   const router = useRouter();
-  const searchParams = useSearchParams()
   const [roomDetails,setRoomDetails] = useState([])
   const [hotelDetails,setHotelDetails] = useState([])
-  // const hotelname = searchParams.get('hotelname')
-  // const roomCategory = searchParams.get('roomCategory');
-  // const checkInDate = searchParams.get('checkInDate');
-  // const checkOutDate = searchParams.get('checkOutDate');
-  // const travellers = searchParams.get('travellers');
-  // const rooms = searchParams.get('rooms');
-  // const roomId = searchParams.get('roomId');
-  // const userEmail = searchParams.get('userEmail');
   const initialize = useAuthStore((state) => state.initialize);
   const checkoutDetails = useAuthStore((state) => state.checkoutDetails);
   const hotelname = checkoutDetails.hotelname

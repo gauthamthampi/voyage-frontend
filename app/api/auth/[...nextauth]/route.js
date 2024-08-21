@@ -13,7 +13,7 @@ export const authOptions = {
     async jwt({ token, account, profile }) {
       if (account && profile) {
         try {
-          const response = await axios.post(`http://localhost:3001/googleauth_signup`, {
+          const response = await axios.post('http://localhost:3001/googleauth_signup', {
             email: profile.email,
             firstname: profile.name,
           });
@@ -36,10 +36,10 @@ export const authOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      return baseUrl;  // Redirect to the home page after login
+      return baseUrl;  
     },
   },
 };
 
-const handler = NextAuth(authOptions);
-export default handler;
+
+export default NextAuth(authOptions);

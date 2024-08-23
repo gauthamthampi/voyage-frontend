@@ -379,7 +379,7 @@ const HotelDetail = ({ id }) => {
       : 'hover:bg-blue-600'
   } text-white p-2 rounded-md`}
 >
-  Location {averageRatings?.location ? averageRatings.location.toFixed(1) : 'No rating'}
+  Location {averageRatings?.location ? averageRatings.location.toFixed(1) : '0'}
 </p>
 
 <p
@@ -393,7 +393,7 @@ const HotelDetail = ({ id }) => {
       : 'hover:bg-blue-600'
   } text-white p-2 rounded-md mt-1`}
 >
-  Cleanliness {averageRatings?.cleanliness ? averageRatings.cleanliness.toFixed(1) : 'No rating'}
+  Cleanliness {averageRatings?.cleanliness ? averageRatings.cleanliness.toFixed(1) : '0'}
 </p>
 
 <p
@@ -407,7 +407,7 @@ const HotelDetail = ({ id }) => {
       : 'hover:bg-blue-600'
   } text-white p-2 rounded-md mt-1`}
 >
-  Service {averageRatings?.service ? averageRatings.service.toFixed(1) : 'No rating'}
+  Service {averageRatings?.service ? averageRatings.service.toFixed(1) : '0'}
 </p>
 
 <p
@@ -421,7 +421,7 @@ const HotelDetail = ({ id }) => {
       : 'hover:bg-blue-600'
   } text-white p-2 rounded-md mt-1`}
 >
-  Facilities {averageRatings?.facilities ? averageRatings.facilities.toFixed(1) : 'No rating'}
+  Facilities {averageRatings?.facilities ? averageRatings.facilities.toFixed(1) : '0'}
 </p>
 
             </div>

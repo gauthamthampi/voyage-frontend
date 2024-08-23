@@ -290,17 +290,7 @@ const HotelDetail = ({ id }) => {
       return;
     }
   
-  //   const queryParams = new URLSearchParams({
-  //     roomCategory: selectedRoomCategory,
-  //     hotelname: hotelname,
-  //     checkInDate,
-  //     checkOutDate,
-  //     travellers: numTravellers,
-  //     rooms: numRooms,
-  //     roomId: selectedRoom._id,
-  //     userEmail: userEmail,
-  //   }).toString();
-  //   router.push(`/checkout?${queryParams}`);
+ 
   const checkoutData = {
     roomCategory: selectedRoomCategory,
     hotelname: hotelname,
@@ -360,7 +350,22 @@ const HotelDetail = ({ id }) => {
          
           <p className="mt-2">{propertyDetails.description}</p>
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
-            <p className="text-2xl font-bold"> {averageRatings?.overallAverage ? averageRatings.overallAverage.toFixed(1) : 'No rating'} Excellent</p>
+          <p className="text-2xl font-bold">
+  {averageRatings?.overallAverage ? (
+    <>
+      {averageRatings.overallAverage.toFixed(1)}{' '}
+      {averageRatings.overallAverage >= 4
+        ? 'Excellent'
+        : averageRatings.overallAverage >= 3
+        ? 'Good'
+        : averageRatings.overallAverage >= 2
+        ? 'Average'
+        : 'Below Average'}
+    </>
+  ) : (
+    'No rating'
+  )}
+</p>
             <p className="text-gray-500">{ratings.length} Reviews</p>
             <div className="mt-2">
             <p

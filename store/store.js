@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { signOut } from 'next-auth/react';
+
 
 const useAuthStore = create((set) => ({
   isLoggedIn: false,
@@ -30,6 +32,7 @@ const useAuthStore = create((set) => ({
     if (typeof window !== 'undefined') {
       localStorage.removeItem('usertoken');
       set({ isLoggedIn: false });
+      signOut({ callbackUrl: '/' });
     }
   },
 

@@ -1,5 +1,7 @@
 import React from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Link from 'next/link';
+
 
 const BannerFront = () => {
   return (
@@ -12,9 +14,13 @@ const BannerFront = () => {
     <p className="max-w-2xl mb-6 font-light text-gray-300 lg:mb-8 md:text-lg lg:text-xl ">
       Enjoy seamless scheduling, automated reminders, and real-time availability from any device. Simplify your room reservations today!
     </p>
-    <button className="relative flex h-[50px] w-40 items-center justify-center overflow-hidden bg-blue-600 font-medium text-white shadow-2xl transition-all duration-300 before:absolute before:inset-0 before:border-0 before:border-white before:duration-100 before:ease-linear rounded-full hover:bg-white hover:text-blue-600 hover:shadow-blue-600 hover:before:border-[25px]">
-      <span className="relative z-10">{`Explore Now >>`}</span>
-    </button>
+
+<Link href="/explore">
+  <button className="relative flex h-[50px] w-40 items-center justify-center overflow-hidden bg-blue-600 font-medium text-white shadow-2xl transition-all duration-300 before:absolute before:inset-0 before:border-0 before:border-white before:duration-100 before:ease-linear rounded-full hover:bg-white hover:text-blue-600 hover:shadow-blue-600 hover:before:border-[25px]">
+    <span className="relative z-10">{`Explore Now >>`}</span>
+  </button>
+</Link>
+
   </div>
   <div className="hidden lg:mt-0 lg:col-span-5 lg:flex justify-center items-center">
     <div className="loader2">

@@ -146,6 +146,7 @@ const Destinations = () => {
     formData.append('description', destinationDetails.description);
     if (coverPhotoFile) {
       formData.append('photos', coverPhotoFile);
+      
     }
     formData.append('bestSeason', destinationDetails.bestSeason);
     formData.append('thingsToDo', JSON.stringify(destinationDetails.thingsToDo));
@@ -158,11 +159,37 @@ const Destinations = () => {
           },
         });
       } else {
-        await axios.post(`${localhost}/admin/addDestination`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        try{
+          await axios.post(`${localhost}/admin/addDestination`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          toast.success('Destination Added successfully', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
+        }catch(error){
+          toast.success('Error adding destination',error , {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
+        }
+        
       }
   
       setShowModal(false);
@@ -195,7 +222,7 @@ const Destinations = () => {
       bestSeason: destination.bestSeason,
       thingsToDo: destination.thingsToDo,
     });
-    setCoverPhotoPreview(`${localhost}/uploads/${destination.photos}`);
+    setCoverPhotoPreview(`${localhost}/uploads/${destination.coverPhoto}`);
     setShowModal(true);
   };
 
@@ -419,7 +446,8 @@ const Destinations = () => {
                   <img src={`${localhost}/uploads/${destination.coverPhoto}`} alt="Destination Cover" className='w-20 h-auto' />
                 </td>
                 <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{destination.name}</td>
-                <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{destination.description}</td>
+                <td className='border border-gray-300 px-4 py-4 whitespace-normal break-words'>{destination.description}</td>
+
                 <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>{destination.status ? 'Active' : 'Inactive'}</td>
                 <td className='border border-gray-300 px-4 py-4 whitespace-nowrap'>
                   <button

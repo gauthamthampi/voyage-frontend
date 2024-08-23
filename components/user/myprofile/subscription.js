@@ -9,6 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 import { set } from 'date-fns';
 import { localhost } from '../../../url';
 import axiosInstance from '@/utils/axios';
+import getEmailFromToken from '@/utils/decode';
 
 const Subscriptions = () => {
     const router = useRouter();
@@ -16,13 +17,14 @@ const Subscriptions = () => {
     const [isPremium,setisPremium] = useState()
     const [Email,setEmail] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const userEmail = getEmailFromToken()
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
     const handleCancel = async() => {
     try{
         const result = await axiosInstance.put(localhost+"/api/cancelPremium",{
-            email:Email
+            email:userEmail
         })
         if (result.data.success) {
             toast.success(`Your subscription cancellation was successful!`, {
@@ -36,6 +38,7 @@ const Subscriptions = () => {
               theme: "dark",
               transition: Bounce,
             });
+            setisPremium(false)
           } else {
             console.log(result.data.message);
             toast.error(`There was an issue cancelling your subscription. Please contact support.`, {
@@ -71,20 +74,14 @@ const Subscriptions = () => {
        
     useEffect(() => {
         const fetchUserDetails = async () => {
-          const token = localStorage.getItem('usertoken');
-          if (token) {
-            const decodedToken = jwtDecode(token);
-            const userEmail = decodedToken.email;
-            console.log(userEmail);
-             
             try {
-              const response = await axios.get(`${localhost}/user/getuser?email=${userEmail}`);
+              const response = await axiosInstance.get(`${localhost}/user/getuser?email=${userEmail}`);
               setEmail(response.data.email);
               setisPremium(response.data.premium);
             } catch (error) {
               console.error('There was a problem with the axios operation:', error);
             }
-          }
+          
         };
     
         fetchUserDetails();
@@ -128,8 +125,8 @@ const Subscriptions = () => {
                 order_id: data.id,
                 handler: async function (response) {
                     try {
-                      const result = await axios.post(localhost+"/updatePremiumStatus", {
-                        email: Email,
+                      const result = await axiosInstance.post(localhost+"/updatePremiumStatus", {
+                        email: userEmail,
                         // paymentId: response.razorpay_payment_id,
                       });
                   
@@ -145,6 +142,7 @@ const Subscriptions = () => {
                           theme: "dark",
                           transition: Bounce,
                         });
+                        setisPremium(true)
                       } else {
                         toast.error(`There was an issue updating your premium status. Please contact support.`, {
                           position: "top-right",
@@ -160,7 +158,7 @@ const Subscriptions = () => {
                       }
                     } catch (error) {
                         console.error("Error updating premium status:", error);
-                        toast.error(`There was an issue updating your premium status. Please contact support.`, {
+                        toast.error(`There was an issue updating your premium status. Please contact support.`,error, {
                             position: "top-right",
                             autoClose: 5000,
                             hideProgressBar: false,

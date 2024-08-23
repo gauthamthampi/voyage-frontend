@@ -14,10 +14,10 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     setLogout();
-    await signOut({ redirect: false }); 
+    document.cookie = 'next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+    await signOut({ redirect: true, callbackUrl: '/login' });
     window.location.href = "/login";
   };
-
   const handleSignIn = () => {
     window.location.href = "/login";
   };
@@ -56,7 +56,7 @@ const Navbar = () => {
                   {isLoggedIn ? (
                     <>
                       <a href="/myprofile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
-                      <a href="/properties" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Properties</a>
+                      <a href="/properties" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Premium Panel</a>
                       <button onClick={handleLogout} type="submit" className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         Sign out
                       </button>

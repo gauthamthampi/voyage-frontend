@@ -7,8 +7,8 @@ import getEmailFromToken from '@/utils/decode';
 const ChatPage = () => {
   const params = useParams();
   const receiverEmail = decodeURIComponent(params.email);
-  const senderEmail = getEmailFromToken(); // Assuming this function returns the logged-in user's email
-  const router = useRouter(); // Use router for navigation
+  const senderEmail = getEmailFromToken(); 
+  const router = useRouter(); 
 
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -119,15 +119,22 @@ const ChatPage = () => {
   };
 
   const openChat = (email) => {
+    const room = [senderEmail, email].sort().join('-');
+    
+    socket.emit('markMessagesAsRead', { senderEmail, receiverEmail: email });
+  
     router.push(`/chat/${encodeURIComponent(email)}`);
-    socket.emit('getPreviousChats', senderEmail); // Refresh previous chats
+  
+    setSidebarChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.email === email ? { ...chat, newMessageCount: 0 } : chat
+      )
+    );
   };
-
   return (
     <div className="flex h-screen">
-      {/* Sidebar for previous chats */}
-      <div className="w-1/4 bg-gray-100 p-4 border-r">
-        <h2 className="text-lg font-bold mb-4">Chats</h2>
+      <div className="w-1/4 bg-gray-200 p-4 border-r">
+        <h2 className="text-lg font-bold mb-4 ">Chats</h2>
         <ul>
           {sidebarChats.map((chat, index) => (
             <li key={index} className="mb-2 relative">
@@ -141,7 +148,7 @@ const ChatPage = () => {
                   className="w-12 h-12 rounded-full"
                 />
                 <div>
-                  <div className="font-semibold">{chat.name}</div>
+                  <div className="font-semibold ">{chat.name}</div>
                   <div className="text-sm text-gray-600 truncate">
                     {chat.lastMessage}
                   </div>
@@ -157,10 +164,8 @@ const ChatPage = () => {
         </ul>
       </div>
 
-      {/* Chat area */}
       <div className="flex-1 flex flex-col">
-        {/* Header with user details */}
-        <div className="bg-blue-500 text-white p-4 flex items-center justify-between">
+        <div className="bg-black text-white p-4 flex items-center justify-between">
           <div className="flex items-center">
             <img
               src={receiverDetails.profilePic || '/images/defaultdp.jpg'}
@@ -174,7 +179,14 @@ const ChatPage = () => {
               <div className="text-sm">{receiverEmail}</div>
             </div>
           </div>
-          <div className="text-sm">{userStatus}</div> {/* Display the activity status */}
+          <div
+  className={`text-sm ${
+    userStatus === 'Online' ? 'text-green-400' : 'text-white'
+  }`}
+>
+  {userStatus}
+</div>
+ 
         </div>
 
         {/* Chat messages */}
@@ -197,7 +209,7 @@ const ChatPage = () => {
                 <div
                   className={`p-2 rounded-lg max-w-xs ${
                     msg.sender === senderEmail
-                      ? 'bg-blue-500 text-white self-end'
+                      ? 'bg-black text-white self-end'
                       : 'bg-gray-200 text-black self-start'
                   }`}
                 >

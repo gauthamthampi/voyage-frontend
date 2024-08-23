@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "VOYAGE",
   description: "Travel with us",
+  icons:'images/favicon.png'
 };
 
 export default function RootLayout({

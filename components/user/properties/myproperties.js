@@ -345,7 +345,8 @@ function MyProperties() {
           <tbody>
             {properties.map((prop) => (
               <tr key={prop._id} className='hover:bg-gray-100'>
-                <td className='py-2 px-4 border-b text-center'>{prop.name}</td>
+               <td className='py-2 px-4 border-b text-center break-words'>{prop.name}</td>
+
                 <td className='py-2 px-4 border-b text-start'>
                   {prop.photos.length > 0 && (
                     <img src={`http://localhost:3001/uploads/${prop.photos[0]}`} alt={prop.name} className='w-20 h-20 object-cover' />

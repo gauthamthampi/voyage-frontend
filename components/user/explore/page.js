@@ -182,7 +182,7 @@ const Explore = () => {
         <div className="grid gap-4">
           {paginatedHotels.map((hotel, index) => (
             <div key={index} className="flex bg-white p-4 rounded-lg shadow-lg">
-              <Image
+              <img
                 src={`${localhost}/uploads/${hotel.photos[0]}`}
                 alt={hotel.name}
                 width={150}

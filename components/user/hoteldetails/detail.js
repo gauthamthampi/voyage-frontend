@@ -328,7 +328,7 @@ const HotelDetail = ({ id }) => {
           <Carousel showThumbs={false} autoPlay={true} infiniteLoop={true}>
             {propertyDetails.photos.map((image, index) => (
               <div key={index} onClick={() => openModal(`${localhost}/uploads/${image}`)}>
-                <Image 
+                <img 
                   src={`${localhost}/uploads/${image}`}
                   alt={`Hotel Image ${index + 1}`}
                   width={600}

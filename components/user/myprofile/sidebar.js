@@ -20,7 +20,7 @@ const SidebarProfile = ({ onItemClick }) => {
           onClick={() => onItemClick('Item 3')} 
           className="cursor-pointer p-4 hover:bg-gray-200"
         >
-          Rewards and Wallet
+          Rewards 
         </li>
         <li 
           onClick={() => onItemClick('Item 4')} 

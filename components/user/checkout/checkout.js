@@ -360,7 +360,7 @@ const Checkout = () => {
             className="w-full mt-2 p-2 border rounded-lg"
           >
             <option value="online">Online</option>
-            <option value="cod">Cash on Delivery</option>
+            
           </select>
         </div>
         {appliedCoupon ? (

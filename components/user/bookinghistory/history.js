@@ -591,6 +591,7 @@ const BookingHistory = () => {
                   className="w-full h-64 object-cover rounded-t-lg"
                   onError={(e) => (e.target.src = 'default-image-path.jpg')}
                 />
+                </Link>
                 <div className="p-6 flex flex-col md:flex-row">
                   <div className="flex-1">
                     <h3
@@ -646,7 +647,7 @@ const BookingHistory = () => {
                     )}
                   </div>
                 </div>
-              </Link>
+              
             </motion.div>
           ))}
           <div ref={lastBookingElementRef}></div>

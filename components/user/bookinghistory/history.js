@@ -688,46 +688,60 @@ const BookingHistory = () => {
           <div className="bg-white rounded-lg p-8 shadow-lg">
             <h2 className="text-2xl font-bold mb-4">Rate & Review Booking</h2>
             <div className="space-y-4">
-              <Rating
-                count={5}
-                size={24}
-                value={rating.location}
-                onChange={(value) => handleRatingChange('location', value)}
-                filledColor="#FFD700"
-                half={false}
-                edit={true}
-                label="Location"
-              />
-              <Rating
-                count={5}
-                size={24}
-                value={rating.cleanliness}
-                onChange={(value) => handleRatingChange('cleanliness', value)}
-                filledColor="#FFD700"
-                half={false}
-                edit={true}
-                label="Cleanliness"
-              />
-              <Rating
-                count={5}
-                size={24}
-                value={rating.facilities}
-                onChange={(value) => handleRatingChange('facilities', value)}
-                filledColor="#FFD700"
-                half={false}
-                edit={true}
-                label="Facilities"
-              />
-              <Rating
-                count={5}
-                size={24}
-                value={rating.service}
-                onChange={(value) => handleRatingChange('service', value)}
-                filledColor="#FFD700"
-                half={false}
-                edit={true}
-                label="Service"
-              />
+            <div>
+  <div className="rating-section">
+    <label className="rating-label">Location</label>
+    <Rating
+      count={5}
+      size={24}
+      value={rating.location}
+      onChange={(value) => handleRatingChange('location', value)}
+      filledColor="#FFD700"
+      half={false}
+      edit={true}
+    />
+  </div>
+
+  <div className="rating-section">
+    <label className="rating-label">Cleanliness</label>
+    <Rating
+      count={5}
+      size={24}
+      value={rating.cleanliness}
+      onChange={(value) => handleRatingChange('cleanliness', value)}
+      filledColor="#FFD700"
+      half={false}
+      edit={true}
+    />
+  </div>
+
+  <div className="rating-section">
+    <label className="rating-label">Facilities</label>
+    <Rating
+      count={5}
+      size={24}
+      value={rating.facilities}
+      onChange={(value) => handleRatingChange('facilities', value)}
+      filledColor="#FFD700"
+      half={false}
+      edit={true}
+    />
+  </div>
+
+  <div className="rating-section">
+    <label className="rating-label">Service</label>
+    <Rating
+      count={5}
+      size={24}
+      value={rating.service}
+      onChange={(value) => handleRatingChange('service', value)}
+      filledColor="#FFD700"
+      half={false}
+      edit={true}
+    />
+  </div>
+</div>
+
               <textarea
                 value={review}
                 onChange={(e) => setReview(e.target.value)}

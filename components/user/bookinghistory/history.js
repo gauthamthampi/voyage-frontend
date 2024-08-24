@@ -629,7 +629,7 @@ const BookingHistory = () => {
                       >
                         Cancel Booking
                       </button>
-                    ) : booking.status === 'Completed' && !booking.hasRated ? (
+                    ) : booking.status === 'Completed' && !booking.ratingSubmission ? (
                       <button
                         onClick={() => {
                           setBookingToRate(booking._id);

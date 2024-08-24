@@ -391,7 +391,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { motion } from 'framer-motion';
 import getEmailFromToken from '@/utils/decode';
 import Rating from 'react-rating-stars-component';
-import Link from 'next/link';
 
 const BookingHistory = () => {
   const [bookings, setBookings] = useState([]);
@@ -584,14 +583,12 @@ const BookingHistory = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Link href={`/bookingconfirmation/${booking._id}`}>
                 <img
                   src={`${localhost}/uploads/${booking.propertyId.photos[0]}`}
                   alt={booking.propertyId.name}
                   className="w-full h-64 object-cover rounded-t-lg"
                   onError={(e) => (e.target.src = 'default-image-path.jpg')}
                 />
-                </Link>
                 <div className="p-6 flex flex-col md:flex-row">
                   <div className="flex-1">
                     <h3
@@ -645,6 +642,11 @@ const BookingHistory = () => {
                     ) : (
                       <p className="text-gray-500 italic">No actions available</p>
                     )}
+                    <a href={`/bookingconfirmation/${booking._id}`}>
+                    <button className='bg-blue-500 hover:bg-blue-800 text-white py-2 px-2 rounded-lg transition duration-300'>
+                      View
+                      </button>
+                      </a>
                   </div>
                 </div>
               

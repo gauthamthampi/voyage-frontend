@@ -76,7 +76,7 @@ const Article = () => {
                 }}
             >
                 <img
-                    src={`${localhost}/uploads/${blog.photos}`}
+                    src={`${localhost}/${blog.photos}`}
                     alt="Blog"
                     className="mx-auto h-96 w-full object-cover"
                 />
